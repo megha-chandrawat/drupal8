@@ -1,0 +1,7 @@
+siteapi_key.APIpage:
+  path: '/page_json/{api_key}/{nid}'
+  defaults:
+    _controller: '\Drupal\siteapi_key\Controller\APIpageController::APIpage'
+    _title: 'JSON result of Node'
+  requirements:
+    _permission: 'access content'

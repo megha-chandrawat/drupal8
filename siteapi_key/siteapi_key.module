@@ -1,0 +1,40 @@
+<?php
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Form\FormStateInterface;
+/**
+ * Implements hook_form_alter().
+ */
+function siteapi_key_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+    if($form_id=='system_site_information_settings')
+    {
+        $site_api_value = (\Drupal::config('system.site')->get('site_api_key'))?\Drupal::config('system.site')->get('site_api_key'):'';
+        $button_text=($site_api_value!="")?t('Update Configuration'):t('Save configuration');
+        #Create Field set for API key
+        $form['API Keys'] = array(
+            '#type' => 'details',
+            '#title' => t('API Keys'),
+            '#open' => TRUE,
+          );
+        #Add field in the field set
+          $form['API Keys']['site_api_key'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Site API key'),
+            '#default_value' => $site_api_value,
+        );
+        $form['actions']['submit']['#value'] = $button_text;
+        $form['#submit'][] = 'siteapi_key_custom_submit';
+
+    }
+ 
+}
+/**
+ * Implements custom site configuration submit
+ */
+function siteapi_key_custom_submit($form, FormStateInterface $form_state)
+{
+    if($form_state->getValue('site_api_key') != ''){
+        \Drupal::configFactory()->getEditable('system.site')->set('site_api_key',$form_state->getValue('site_api_key'))->save();
+        drupal_set_message(t('The Site API Key has been saved with '.$form_state->getValue('site_api_key').'').' value', 'status');
+      }
+}
+
